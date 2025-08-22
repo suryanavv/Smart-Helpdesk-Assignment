@@ -1,0 +1,94 @@
+name: Test and Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\").ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: api/package-lock.json
+        
+    - name: Install API dependencies
+      working-directory: ./api
+      run: npm ci
+      
+    - name: Run API tests
+      working-directory: ./api
+      run: npm test
+      
+    - name: Build API
+      working-directory: ./api
+      run: npm run build
+
+  test-client:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+        
+    - name: Install client dependencies
+      working-directory: ./client
+      run: npm ci
+      
+    - name: Run client tests
+      working-directory: ./client
+      run: npm test
+      
+    - name: Build client
+      working-directory: ./client
+      run: npm run build
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        cd api && npm ci
+        cd ../client && npm ci
+        
+    - name: Lint API
+      working-directory: ./api
+      run: npm run lint
+      
+    - name: Lint client
+      working-directory: ./client
+      run: npm run lint

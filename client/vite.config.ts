@@ -15,5 +15,21 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     globals: true,
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select']
+        }
+      }
+    }
+  },
+  preview: {
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
+    host: '0.0.0.0'
   }
 })

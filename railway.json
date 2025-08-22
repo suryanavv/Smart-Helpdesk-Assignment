@@ -1,0 +1,35 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "nixpacks"
+  },
+  "deploy": {
+    "startCommand": "npm start",
+    "healthcheckPath": "/readyz",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "on_failure",
+    "restartPolicyMaxRetries": 10
+  },
+  "services": [
+    {
+      "name": "api",
+      "sourceDir": "api",
+      "buildCommand": "npm run build",
+      "startCommand": "npm start",
+      "healthcheckPath": "/readyz",
+      "variables": {
+        "NODE_ENV": "production",
+        "PORT": "8080"
+      }
+    },
+    {
+      "name": "client",
+      "sourceDir": "client",
+      "buildCommand": "npm run build",
+      "startCommand": "npm start",
+      "variables": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}

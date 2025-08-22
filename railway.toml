@@ -1,0 +1,22 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/readyz"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[[services]]
+name = "api"
+sourceDir = "api"
+buildCommand = "npm run build"
+startCommand = "npm start"
+healthcheckPath = "/readyz"
+
+[[services]]
+name = "client"
+sourceDir = "client"
+buildCommand = "npm run build"
+startCommand = "npm run preview"
