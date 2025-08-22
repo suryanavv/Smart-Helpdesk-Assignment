@@ -1,0 +1,36 @@
+{
+  "name": "smart-helpdesk",
+  "version": "1.0.0",
+  "description": "Smart Helpdesk with Agentic Triage - MERN Stack Application",
+  "private": true,
+  "workspaces": [
+    "api",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:client\"",
+    "dev:api": "concurrently \"cd api && npm run seed\" \"cd api && npm run dev\"",
+    "dev:client": "cd client && npm run dev",
+    "build": "npm run build:api && npm run build:client",
+    "build:api": "cd api && npm run build",
+    "build:client": "cd client && npm run build",
+    "test": "npm run test:api && npm run test:client",
+    "test:api": "cd api && npm test",
+    "test:client": "cd client && npm test",
+    "test:docker": "bash scripts/test.sh",
+    "lint": "npm run lint:api && npm run lint:client",
+    "lint:api": "cd api && npm run lint",
+    "lint:client": "cd client && npm run lint",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "seed": "cd api && npm run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}

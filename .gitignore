@@ -1,0 +1,54 @@
+# Root Git Ignore for MERN monorepo
+
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build output
+/dist/
+/build/
+**/dist/
+**/build/
+**/.vite/
+**/.cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage
+coverage/
+**/coverage/
+
+# Env files (keep examples only)
+.env
+.env.*
+!.env.example
+
+# Editor/OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Docker/local data
+mongo-data/
+
+# Misc temp
+.tmp/
+.temp/
+temp/

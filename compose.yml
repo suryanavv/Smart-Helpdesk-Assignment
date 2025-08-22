@@ -1,0 +1,67 @@
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    image: app-api:latest
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8080
+      - MONGO_URI=mongodb://mongo:27017/helpdesk
+      - JWT_SECRET=change-me
+      - AUTO_CLOSE_ENABLED=true
+      - CONFIDENCE_THRESHOLD=0.78
+      - STUB_MODE=true
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8080/readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  client:
+    image: app-client:latest
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8080/api
+    environment: []
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+
+  seed:
+    image: app-api:latest
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/helpdesk
+      - JWT_SECRET=change-me
+    command: ["node", "dist/seed.js"]
+
+volumes:
+  mongo-data:
+
+

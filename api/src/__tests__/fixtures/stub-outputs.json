@@ -1,0 +1,70 @@
+{
+  "classifications": {
+    "billing": {
+      "keywords": ["refund", "invoice", "payment", "charge", "billing", "money", "cost", "price", "fee"],
+      "confidence": 0.9
+    },
+    "tech": {
+      "keywords": ["error", "bug", "stack", "crash", "500", "404", "login", "password", "technical", "system"],
+      "confidence": 0.85
+    },
+    "shipping": {
+      "keywords": ["delivery", "shipment", "tracking", "package", "shipping", "postal", "mail", "address"],
+      "confidence": 0.8
+    },
+    "other": {
+      "keywords": ["general", "question", "help", "support", "info"],
+      "confidence": 0.5
+    }
+  },
+  "draftReplies": {
+    "billing": "Thank you for contacting us about your billing inquiry. Based on our records, here are the steps to resolve your issue:\n\n1. [Reference relevant KB article]\n2. [Additional guidance]\n\nIf you need further assistance, please don't hesitate to reach out.",
+    "tech": "I understand you're experiencing a technical issue. Here's what we can do to help resolve this:\n\n1. [Reference relevant KB article]\n2. [Troubleshooting steps]\n\nPlease try these steps and let us know if the issue persists.",
+    "shipping": "Thank you for your shipping inquiry. Here's the information you need:\n\n1. [Reference relevant KB article]\n2. [Shipping details]\n\nIf you have any other questions about your shipment, please let us know.",
+    "other": "Thank you for reaching out to our support team. I'd be happy to help you with your inquiry.\n\n1. [General guidance]\n2. [Next steps]\n\nPlease let me know if you need any clarification or have additional questions."
+  },
+  "kbSearchResults": {
+    "billing": [
+      {
+        "id": "billing-001",
+        "title": "Refund Policy and Process",
+        "snippet": "Learn about our refund policy and how to request a refund for your purchase.",
+        "score": 0.95
+      },
+      {
+        "id": "billing-002", 
+        "title": "Payment Methods Accepted",
+        "snippet": "We accept various payment methods including credit cards, PayPal, and bank transfers.",
+        "score": 0.85
+      }
+    ],
+    "tech": [
+      {
+        "id": "tech-001",
+        "title": "Troubleshooting Common Login Issues",
+        "snippet": "Step-by-step guide to resolve common login problems and error messages.",
+        "score": 0.92
+      },
+      {
+        "id": "tech-002",
+        "title": "System Requirements and Compatibility",
+        "snippet": "Check if your system meets our requirements for optimal performance.",
+        "score": 0.78
+      }
+    ],
+    "shipping": [
+      {
+        "id": "shipping-001",
+        "title": "Shipping Options and Delivery Times",
+        "snippet": "Overview of available shipping methods and estimated delivery times.",
+        "score": 0.88
+      },
+      {
+        "id": "shipping-002",
+        "title": "Track Your Package",
+        "snippet": "How to track your shipment and what to do if there are delivery issues.",
+        "score": 0.82
+      }
+    ]
+  }
+}

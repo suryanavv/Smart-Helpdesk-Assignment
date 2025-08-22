@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  api-tests:
+    image: node:20-alpine
+    working_dir: /workspace/api
+    volumes:
+      - ./:/workspace:rw
+    environment:
+      NODE_ENV: test
+      CI: "1"
+    command: sh -lc "npm ci || npm install && npm test"
+
+  client-tests:
+    image: node:20-alpine
+    working_dir: /workspace/client
+    volumes:
+      - ./:/workspace:rw
+    environment:
+      NODE_ENV: test
+      CI: "1"
+    command: sh -lc "npm ci || npm install && npm test"
+
+
