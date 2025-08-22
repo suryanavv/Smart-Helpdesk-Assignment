@@ -9,6 +9,7 @@ import { CreateTicketForm } from '@/components/tickets/CreateTicketForm';
 import { TicketDetail } from '@/components/tickets/TicketDetail';
 import { KBListPage } from '@/pages/KBListPage';
 import { KBEditorPage } from '@/pages/KBEditorPage';
+import { KBArticleView } from '@/pages/KBArticleView';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 import { Toaster } from '@/components/ui/sonner';
@@ -80,6 +81,16 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <TicketDetail />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* KB Article View - Available to all authenticated users for citations */}
+      <Route
+        path="/kb/:id/view"
+        element={
+          <ProtectedRoute>
+            <KBArticleView />
           </ProtectedRoute>
         }
       />

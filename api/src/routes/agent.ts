@@ -15,7 +15,7 @@ router.post('/triage', requireAuth, requireRole('admin', 'agent'), async (req, r
 
 router.get('/suggestion/:ticketId', requireAuth, async (req, res) => {
 	const suggestion = await AgentSuggestion.findOne({ ticketId: req.params.ticketId }).sort({ createdAt: -1 }).lean();
-	if (!suggestion) return res.status(404).json({ error: 'Not found' });
+	if (!suggestion) return res.status(204).end();
 	return res.json(suggestion);
 });
 

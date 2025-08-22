@@ -8,6 +8,8 @@ COPY src ./src
 RUN npm run build
 
 FROM node:20-alpine
+# Install curl for container healthchecks
+RUN apk add --no-cache curl
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=base /app/package*.json ./

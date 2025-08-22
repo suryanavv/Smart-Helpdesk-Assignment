@@ -48,7 +48,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-background w-screen overflow-x-hidden">
         <Sidebar collapsible="icon" className="hidden md:block" aria-label="Main sidebar">
           <SidebarHeader className="border-b border-border p-4">
             <div className="flex items-center space-x-2">
@@ -105,7 +105,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         </Sidebar>
 
         <SidebarInset>
-          <header className="border-b border-border bg-background px-4 sm:px-6 py-3 sticky top-0 z-10">
+          <header className="border-b border-border bg-background px-4 sm:px-6 py-3 sticky top-0 z-10 w-full">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="md:hidden" aria-label="Toggle sidebar" />
@@ -149,7 +149,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             </div>
           </header>
 
-          <main className="flex-1 overflow-auto px-4 sm:px-6 py-6 w-full">
+          <main className="flex-1 overflow-x-hidden px-4 sm:px-6 py-6 w-full">
             {children}
           </main>
         </SidebarInset>

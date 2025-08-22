@@ -10,7 +10,7 @@ import type {
 } from '@/types';
 import { toast } from 'sonner';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
 
 class ApiError extends Error {
   public status: number;
@@ -53,6 +53,12 @@ async function request<T>(
       const maybeJson = await response.clone().json();
       if (maybeJson && typeof maybeJson.error === 'string') message = maybeJson.error;
     } catch {}
+    
+    // Don't show toast for 401 errors in request helper - let components handle it
+    if (response.status !== 401) {
+      toast.error(message);
+    }
+    
     throw new ApiError(response.status, message);
   }
 
@@ -86,6 +92,10 @@ export const authApi = {
   async logout(): Promise<void> {
     await request<void>('/auth/logout', { method: 'POST' });
     localStorage.removeItem('user');
+  },
+
+  async me(): Promise<{ user: User }> {
+    return request<{ user: User }>('/auth/me');
   },
 };
 
@@ -145,7 +155,7 @@ export const ticketsApi = {
   async reply(id: string, reply: string): Promise<void> {
     return request<void>(`/tickets/${id}/reply`, {
       method: 'POST',
-      body: JSON.stringify({ reply }),
+      body: JSON.stringify({ message: reply }),
     });
   },
 
@@ -167,7 +177,19 @@ export const agentApi = {
   },
 
   async getSuggestion(ticketId: string): Promise<AgentSuggestion> {
-    return request<AgentSuggestion>(`/agent/suggestion/${ticketId}`);
+    const res = await fetch(`${API_BASE}/agent/suggestion/${ticketId}`, { credentials: 'include' });
+    if (res.status === 204) {
+      return undefined as unknown as AgentSuggestion;
+    }
+    if (!res.ok) {
+      let message = `HTTP ${res.status}`;
+      try {
+        const maybeJson = await res.clone().json();
+        if (maybeJson && typeof maybeJson.error === 'string') message = maybeJson.error;
+      } catch {}
+      throw new ApiError(res.status, message);
+    }
+    return res.json();
   },
 };
 

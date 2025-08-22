@@ -38,18 +38,45 @@ router.post('/', requireAuth, async (req, res) => {
 
 router.get('/', requireAuth, async (req, res) => {
 	const status = String(req.query.status || '');
-	const mine = String(req.query.mine || 'false').toLowerCase() === 'true';
-	const assignedToMe = String(req.query.assignedToMe || 'false').toLowerCase() === 'true';
+	const category = String(req.query.category || '');
 	const filter: Record<string, unknown> = {};
+	
+	// Apply status filter if provided
 	if (status) filter.status = status;
-	if (mine) filter.createdBy = req.auth!.userId;
-	if (assignedToMe) filter.assignee = req.auth!.userId;
-	const tickets = await Ticket.find(filter).sort({ createdAt: -1 }).limit(50).lean();
+	if (category) filter.category = category;
+	
+	// Role-based filtering:
+	// - Users can only see their own tickets
+	// - Agents and admins can see all tickets
+	if (req.auth!.role === 'user') {
+		filter.createdBy = req.auth!.userId;
+	}
+	// For admin/agent, no additional filtering - they see all tickets
+	
+	const tickets = await Ticket.find(filter)
+		.populate('createdBy', 'name email')
+		.populate('assignee', 'name email')
+		.sort({ createdAt: -1 })
+		.limit(50)
+		.lean();
 	return res.json(tickets);
 });
 
 router.get('/:id', requireAuth, async (req, res) => {
-	const ticket = await Ticket.findById(req.params.id).lean();
+	const filter: Record<string, unknown> = { _id: req.params.id };
+	
+	// Role-based access control:
+	// - Users can only access their own tickets
+	// - Agents and admins can access any ticket
+	if (req.auth!.role === 'user') {
+		filter.createdBy = req.auth!.userId;
+	}
+	
+	const ticket = await Ticket.findOne(filter)
+		.populate('createdBy', 'name email')
+		.populate('assignee', 'name email')
+		.lean();
+	
 	if (!ticket) return res.status(404).json({ error: 'Not found' });
 	return res.json(ticket);
 });

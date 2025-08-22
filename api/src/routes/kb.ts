@@ -5,6 +5,15 @@ import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 
+// Individual article access - available to all authenticated users (for citations)
+router.get('/:id', requireAuth, async (req, res) => {
+	const article = await Article.findById(req.params.id).lean();
+	if (!article || article.status !== 'published') {
+		return res.status(404).json({ error: 'Article not found' });
+	}
+	return res.json(article);
+});
+
 // Read access limited to staff (admin/agent). End users have no direct KB access
 router.get('/', requireAuth, requireRole('admin', 'agent'), async (req, res) => {
 	const query = String(req.query.query || '').trim();
@@ -12,9 +21,26 @@ router.get('/', requireAuth, requireRole('admin', 'agent'), async (req, res) => 
 		const articles = await Article.find({ status: 'published' }).limit(20).lean();
 		return res.json(articles);
 	}
-	const results = await Article.find({ $text: { $search: query }, status: 'published' })
-		.limit(10).lean();
-	return res.json(results);
+	try {
+		const results = await Article.find({ $text: { $search: query }, status: 'published' })
+			.limit(10).lean();
+		return res.json(results);
+	} catch (err: any) {
+		// Fallback when text index is missing in ephemeral test DB
+		if (err?.codeName === 'IndexNotFound' || err?.code === 27) {
+			const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+			const results = await Article.find({
+				status: 'published',
+				$or: [
+					{ title: regex },
+					{ body: regex },
+					{ tags: regex },
+				],
+			}).limit(10).lean();
+			return res.json(results);
+		}
+		return res.status(500).json({ error: 'Search failed' });
+	}
 });
 
 const upsertSchema = z.object({

@@ -30,16 +30,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Bootstrap session from localStorage or cookies
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch {
-        localStorage.removeItem('user');
+    // Bootstrap session - validate with server
+    const initializeAuth = async () => {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          // Validate session with server using API method
+          const result = await authApi.me();
+          setUser(normalizeUser(result.user));
+        } catch (error) {
+          console.log('Auth validation failed:', error);
+          localStorage.removeItem('user');
+          setUser(null);
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+    
+    initializeAuth();
   }, []);
 
   const login = async (email: string, password: string) => {

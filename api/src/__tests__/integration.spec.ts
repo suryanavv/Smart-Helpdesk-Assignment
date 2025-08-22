@@ -25,14 +25,14 @@ describe('Integration Tests', () => {
     userToken = jwt.sign({ userId: user._id.toString(), role: 'user' }, config.jwtSecret);
     agentToken = jwt.sign({ userId: agent._id.toString(), role: 'agent' }, config.jwtSecret);
 
-    // Test 1: Auth - User can register and login
+    // Test 1: Auth - User can register and login (cookie-based)
     const reg = await request(app).post('/api/auth/register').send({ 
       name: 'TestUser', 
       email: 'test@example.com', 
       password: 'password123' 
     });
     expect(reg.status).toBe(200);
-    expect(reg.body.token).toBeDefined();
+    expect(reg.body.user).toBeDefined();
 
     // Test 2: KB - Admin can create and search articles
     const article = await Article.create({ 

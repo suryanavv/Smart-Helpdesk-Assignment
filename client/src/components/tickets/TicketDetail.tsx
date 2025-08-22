@@ -9,10 +9,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { agentApi, auditApi, ticketsApi } from '@/lib/api';
 import type { AgentSuggestion, AuditLog, Ticket } from '@/types';
 import { ArrowLeft, Send, Sparkles, Clock, CheckCircle2, User, Bot } from 'lucide-react';
+import { CitationText } from '@/components/common/CitationText';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function TicketDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [suggestion, setSuggestion] = useState<AgentSuggestion | null>(null);
   const [audit, setAudit] = useState<AuditLog[]>([]);
@@ -33,10 +36,12 @@ export function TicketDetail() {
         setAudit(a.sort((x, y) => new Date(x.timestamp).getTime() - new Date(y.timestamp).getTime()));
         try {
           const s = await agentApi.getSuggestion(id);
-          setSuggestion(s);
-          setReply(s.draftReply);
+          if (s) {
+            setSuggestion(s);
+            setReply(s.draftReply);
+          }
         } catch {
-          // no suggestion yet
+          // no suggestion yet or not accessible
         }
       } finally {
         setLoading(false);
@@ -76,6 +81,7 @@ export function TicketDetail() {
 
   const triggerTriage = async () => {
     if (!id) return;
+    if (!user || (user.role !== 'admin' && user.role !== 'agent')) return; // guard non-staff
     setIsTriageLoading(true);
     try {
       await agentApi.triage(id);
@@ -116,10 +122,12 @@ export function TicketDetail() {
           {statusBadge}
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={triggerTriage} disabled={isTriageLoading}>
-            <Sparkles className="mr-2 h-4 w-4" />
-            {isTriageLoading ? 'Triaging...' : 'Run Triage'}
-          </Button>
+          {(user?.role === 'admin' || user?.role === 'agent') && (
+            <Button variant="outline" onClick={triggerTriage} disabled={isTriageLoading}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              {isTriageLoading ? 'Triaging...' : 'Run Triage'}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -160,14 +168,30 @@ export function TicketDetail() {
           <CardContent>
             {!suggestion ? (
               <div className="text-sm text-muted-foreground">
-                No suggestion yet. Run triage to generate a draft reply.
+                {user?.role === 'admin' || user?.role === 'agent' ? 'No suggestion yet. Run triage to generate a draft reply.' : 'Awaiting agent triage.'}
               </div>
             ) : (
               <div className="space-y-3">
-                <pre className="whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">{suggestion.draftReply}</pre>
-                <div className="text-xs text-muted-foreground">
-                  Citations: {suggestion.articleIds.join(', ')}
+                <div className="whitespace-pre-wrap rounded-md bg-muted p-3 text-sm">
+                  <CitationText text={suggestion.draftReply} />
                 </div>
+                {suggestion.articleIds.length > 0 && (
+                  <div className="text-xs text-muted-foreground">
+                    <span>Citations: </span>
+                    {suggestion.articleIds.map((articleId, index) => (
+                      <span key={articleId}>
+                        <Button
+                          variant="link"
+                          className="h-auto p-0 text-xs text-blue-600 hover:text-blue-800 underline"
+                          onClick={() => navigate(`/kb/${articleId}/view`)}
+                        >
+                          Article {articleId.slice(-8)}
+                        </Button>
+                        {index < suggestion.articleIds.length - 1 && ', '}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
