@@ -35,7 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const userData = localStorage.getItem('user');
       if (userData) {
         try {
-          const user = JSON.parse(userData);
+          const _user = JSON.parse(userData);
           // Validate session with server using API method
           const result = await authApi.me();
           setUser(normalizeUser(result.user));

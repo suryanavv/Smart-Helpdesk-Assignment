@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { ticketsApi, showApiError } from '@/lib/api';
 import type { Ticket } from '@/types';
-import { Plus, Search, Filter, Eye, Clock, CheckCircle, AlertCircle, Ticket as TicketIcon } from 'lucide-react';
+import { Plus, Search, Filter, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function TicketList() {
